@@ -3,7 +3,7 @@ name: Deploy Vite App to VPS
 on:
   push:
     branches:
-      - main  # Adjust to your branch name if different
+      - master  # Adjust to your branch name if different
 
 jobs:
   build-and-deploy:
