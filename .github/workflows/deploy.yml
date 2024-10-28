@@ -3,8 +3,7 @@ name: Deploy Vite App
 on:
   push:
     branches:
-      - main  # or whichever branch you use for deployments
-
+      - master
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
