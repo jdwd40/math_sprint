@@ -1,9 +1,9 @@
-name: Deploy Vite App
+name: Deploy Vite App to VPS
 
 on:
   push:
     branches:
-      - master  # Replace with your main deployment branch if different
+      - main  # Adjust to your branch name if different
 
 jobs:
   build-and-deploy:
@@ -16,31 +16,43 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Use the Node.js version your app requires
+        node-version: '18'
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci  # 'npm ci' for clean installs
 
-    - name: Build Vite app
+    - name: Build Vite project
       run: npm run build
 
+    - name: List dist contents
+      run: ls -R dist
+
+    - name: Create deployment test file
+      run: echo "Vite deployment test $(date)" > dist/test.txt
+
     - name: Deploy to VPS
-      env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
-        HOST: ${{ secrets.VPS_HOST }}
-        USER: ${{ secrets.VPS_USER }}
-        PORT: ${{ secrets.VPS_PORT }}
-        TARGET_DIR: /var/www/jdwd40.com/html/ms
+      uses: appleboy/scp-action@v0.1.3
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 4020
+        source: "dist/*"
+        target: "/var/www/jdwd40.com/html/ms"  # Adjust if your app's directory is different
+        strip_components: 1
 
-      run: |
-        # Set up SSH keys and known_hosts for secure access
-        mkdir -p ~/.ssh
-        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-
-        # Package and transfer files
-        tar -czf dist.tar.gz -C dist .
-        scp -P $PORT dist.tar.gz $USER@$HOST:$TARGET_DIR
-        ssh -p $PORT $USER@$HOST "tar -xzf $TARGET_DIR/dist.tar.gz -C $TARGET_DIR && rm $TARGET_DIR/dist.tar.gz"
+    - name: Verify deployment and restart Nginx
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 4020
+        script: |
+          echo "Contents of /var/www/jdwd40.com/html/ms:"
+          ls -la /var/www/jdwd40.com/html/ms
+          echo "Content of test.txt:"
+          cat /var/www/jdwd40.com/html/ms/test.txt
+          echo "Restarting Nginx..."
+          sudo systemctl restart nginx
+          echo "Nginx restarted."
