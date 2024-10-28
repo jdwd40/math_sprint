@@ -17,22 +17,24 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoading: true,
 
   loadUser: async () => {
+    set({ isLoading: true }); // Set loading to true at the start
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (user) {
         const { data: profile } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
-        set({ user, profile, isLoading: false });
+        set({ user, profile });
       } else {
-        set({ user: null, profile: null, isLoading: false });
+        set({ user: null, profile: null });
       }
     } catch (error) {
       console.error('Error loading user:', error);
-      set({ user: null, profile: null, isLoading: false });
+    } finally {
+      set({ isLoading: false }); // Always set loading to false at the end
     }
   },
 

@@ -10,8 +10,8 @@ function App() {
   const { isLoading, loadUser } = useAuthStore();
 
   useEffect(() => {
-    loadUser();
-  }, []);
+    loadUser();  // Load user on app start to ensure profile data is available
+  }, [loadUser]);  // Adding `loadUser` to dependencies for future-proofing
 
   if (isLoading) {
     return (
