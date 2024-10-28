@@ -3,7 +3,7 @@ name: Deploy Vite App
 on:
   push:
     branches:
-      - master  # Adjust branch if needed
+      - main  # or whichever branch you use for deployments
 
 jobs:
   build-and-deploy:
@@ -16,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Use the Node.js version your app requires
+        node-version: '16'  # Use the version you need
 
     - name: Install dependencies
       run: npm install
@@ -26,22 +26,18 @@ jobs:
 
     - name: Deploy to VPS
       env:
-        HOST: ${{ secrets.VPS_HOST }}  # e.g., 213.165.91.221
-        USER: ${{ secrets.VPS_USER }}  # e.g., jd
-        PORT: ${{ secrets.VPS_PORT }}  # e.g., 4020
+        SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+        HOST: ${{ secrets.VPS_HOST }}
+        USER: ${{ secrets.VPS_USER }}
+        PORT: ${{ secrets.VPS_PORT }}
         TARGET_DIR: /var/www/jdwd40.com/html/ms
 
       run: |
+        # Configure known hosts
+        mkdir -p ~/.ssh
+        echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
         # Package and transfer files
         tar -czf dist.tar.gz -C dist .
         scp -P $PORT dist.tar.gz $USER@$HOST:$TARGET_DIR
         ssh -p $PORT $USER@$HOST "tar -xzf $TARGET_DIR/dist.tar.gz -C $TARGET_DIR && rm $TARGET_DIR/dist.tar.gz"
-
-    - name: Restart pm2
-      env:
-        HOST: ${{ secrets.VPS_HOST }}
-        USER: ${{ secrets.VPS_USER }}
-        PORT: ${{ secrets.VPS_PORT }}
-
-      run: |
-        ssh -p $PORT $USER@$HOST "pm2 restart my-vite-app"  # Replace with your pm2 app name
