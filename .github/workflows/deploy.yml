@@ -3,7 +3,8 @@ name: Deploy Vite App
 on:
   push:
     branches:
-      - master
+      - main  # Replace with your main deployment branch if different
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -15,7 +16,7 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '16'  # Use the version you need
+        node-version: '16'  # Use the Node.js version your app requires
 
     - name: Install dependencies
       run: npm install
@@ -25,6 +26,7 @@ jobs:
 
     - name: Deploy to VPS
       env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
         HOST: ${{ secrets.VPS_HOST }}
         USER: ${{ secrets.VPS_USER }}
@@ -32,8 +34,10 @@ jobs:
         TARGET_DIR: /var/www/jdwd40.com/html/ms
 
       run: |
-        # Configure known hosts
+        # Set up SSH keys and known_hosts for secure access
         mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
         echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
 
         # Package and transfer files
