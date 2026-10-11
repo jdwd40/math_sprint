@@ -1,7 +1,3 @@
-Here's a structured README file for your GitHub repository for the **Math Sprint** app:
-
----
-
 # Math Sprint
 
 **Math Sprint** is a mobile-friendly math practice app that allows users to improve their arithmetic skills through quick and engaging sessions. Users can select a math operation (addition, subtraction, multiplication, or division) and answer as many questions as possible within a set time limit. Each correct answer earns points, while incorrect answers deduct points—but scores won’t fall below zero. Each operation has its own separate score table for fair competition and tracking.
@@ -30,7 +26,7 @@ Here's a structured README file for your GitHub repository for the **Math Sprint
 ## Technologies Used
 
 - **Frontend**: Vite.js + React
-  - **Styling**: Chakra UI for responsive, accessible design.
+  - **Styling**: Tailwind CSS for responsive styling.
   - **Responsive Numeric Keypad**: Custom numeric keypad for mobile compatibility.
 - **Backend**: Supabase
   - **Authentication**: User sign-up and login.
@@ -40,8 +36,8 @@ Here's a structured README file for your GitHub repository for the **Math Sprint
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/Math-Sprint.git
-    cd Math-Sprint
+    git clone https://github.com/jdwd40/math_sprint.git
+    cd math_sprint
     ```
 
 2. **Install dependencies**:
@@ -72,7 +68,7 @@ Here's a structured README file for your GitHub repository for the **Math Sprint
     npm run dev
     ```
 
-5. **Visit**: Open your browser and go to `http://localhost:3000`.
+5. **Visit**: Open your browser and go to the local address printed by Vite (normally `http://localhost:5173`).
 
 ## Usage
 
